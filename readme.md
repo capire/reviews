@@ -1,24 +1,28 @@
-# Reviews Service Sample
+# @capire/reviews
 
-## Run all-in-one
+This is a sample app which provides a generic reuse service for managing reviews,
+and a corresponding Fiori UI. It is used in the `bookstore` sample.
 
-Open a terminal window and run the `fiori` app in it:
-
-```sh
-npm run fiori
-```
+> [!CAUTION]
+> This is just a sample, not intended for production use. It is meant to demonstrate how to create a CAP plugin and how to use it in your application. It is not optimized for performance or security.
 
 
-## Run as Separate Services
-
-Open two terminal windows. In the first one start the reviews service stand-alone:
+### Reuse
 
 ```sh
-npm run reviews-service
+npm add @capire/reviews
 ```
 
-In the second one start the `fiori` app:
+<details>
+  <summary><i> Requires this in your .npmrc: </i></summary>
 
-```sh
-npm run fiori
-```
+  ```java
+  @capire:registry=https://npm.pkg.github.com
+  ```
+</details>
+
+
+### Integrate
+
+Instead of embedding it into your application, you can also run the app standalone,
+and consume the service through OData.
