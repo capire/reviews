@@ -19,16 +19,14 @@ createApp ({ setup() {
     reset() { this.succeeded = this.failed = undefined }
   })
 
-  const Ratings = {
-    5: '★★★★★',
-    4: '★★★★☆',
-    3: '★★★☆☆',
-    2: '★★☆☆☆',
-    1: '★☆☆☆☆',
-  }
-
   return {
-    reviews, review, message, Ratings,
+    reviews, review, message, Ratings: {
+      5: '★★★★★',
+      4: '★★★★☆',
+      3: '★★★☆☆',
+      2: '★★☆☆☆',
+      1: '★☆☆☆☆',
+    },
     at: date => date && new Date(date).toDateString(),
 
     async fetch (pattern) {
