@@ -1,4 +1,5 @@
 using { sap.capire.reviews as my } from '../db/schema';
+namespace sap.capire.reviews.app;
 
 type Review {
   subject  : my.Reviews:subject;
