@@ -1,18 +1,19 @@
 using { sap.capire.reviews as my } from '../db/schema';
 
-service ReviewsService @(path:'/reviews') {
+type Review {
+  subject  : my.Reviews:subject;
+  reviewer : my.Reviews:reviewer;
+}
 
-  // Sync API
-  entity Reviews as projection on my.Reviews excluding { likes }
-  action like (review: type of Reviews:ID);
-  action unlike (review: type of Reviews:ID);
+@odata @rest service ReviewsService {
 
-  // Async API
-  event reviewed : {
-    subject : type of Reviews:subject;
-    count   : Integer;
-    rating  : Decimal;
-  }
+  entity ListOfReviews as projection on my.Reviews excluding { text, likes };
+  entity Reviews @cds.redirection.target as projection on my.Reviews;
+
+  // Actions for liking and unliking reviews
+  entity Likes as projection on my.Likes;
+  action like (review: Review);
+  action unlike (review: Review);
 
   // Input validation
   annotate Reviews with {
