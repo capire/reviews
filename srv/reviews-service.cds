@@ -15,13 +15,6 @@ type Review {
   action like (review: Review);
   action unlike (review: Review);
 
-  // Input validation
-  annotate Reviews with {
-    subject  @mandatory;
-    title    @mandatory;
-    rating   @assert.range;
-  }
-
 }
 
 

@@ -1,5 +1,5 @@
 const cds = require ('@sap/cds')
-module.exports = cds.service.impl (function(){
+module.exports = cds.service.impl (async function(){
 
   // Get the CSN definition for Reviews from the db schema for sub-sequent queries
   // ( Note: we explicitly specify the namespace to support embedded reuse )
@@ -9,30 +9,31 @@ module.exports = cds.service.impl (function(){
     if (!req.data.rating) req.data.rating = Math.round(Math.random()*4)+1
   })
 
-  // Emit an event to inform subscribers about new avg ratings for reviewed subjects
-  this.after (['CREATE','UPDATE','DELETE'], 'Reviews', async function(_,req) {
-    const {subject} = req.data
-    const { count, rating } = await SELECT.one `round(avg(rating),2) as rating, count(*) as count` .from (Reviews) .where ({subject})
-    global.it || console.log ('< emitting:', 'reviewed', { subject, count, rating }) // eslint-disable-line no-console
-    await this.emit ('reviewed', { subject, count, rating })
-  })
-
   // Increment counter for reviews considered helpful
   this.on ('like', (req) => {
     if (!req.user)  return req.reject(400, 'You must be identified to like a review')
-    const {review} = req.data, {user} = req
+    let {review} = req.data, {user} = req
     return cds.run ([
-      INSERT.into (Likes) .entries ({review_ID: review, user: user.id}),
-      UPDATE (Reviews) .set({liked: {'+=': 1}}) .where({ID:review})
+      INSERT.into (Likes) .entries ({review_subject: review.subject, review_user: review.user, user: user.id}),
+      UPDATE (Reviews) .set({liked: {'+=': 1}}) .where(review)
     ]).catch(() => req.reject(400, 'You already liked that review'))
   })
 
   // Delete a former like by the same user
   this.on ('unlike', async (req) => {
     if (!req.user)  return req.reject(400, 'You must be identified to remove a former like of yours')
-    const {review} = req.data, {user} = req
-    const affectedRows = await DELETE.from (Likes) .where ({review_ID: review,user: user.id})
-    if (affectedRows === 1)  return UPDATE (Reviews) .set ({liked: {'-=': 1}}) .where ({ID:review})
+    let {review} = req.data, { subject, reviewer } = review, {user} = req
+    // Assuming Reviews entity uses composite keys: subject and user_ID
+    let affectedRows = await DELETE.from (Likes) .where ({ subject, reviewer, user: user.id })
+    if (affectedRows === 1)  return UPDATE (Reviews) .set ({ liked: {'-=': 1} }) .where ({ subject, reviewer })
+  })
+
+
+  // Inform API event subscribers about new avg ratings for reviewed subjects
+  const api = await cds.connect.to ('sap.capire.reviews.api.ReviewsService')
+  this.after (['CREATE','UPDATE','DELETE'], 'Reviews', async function(_,req) {
+    let rating = await api.get ('AverageRatings', { subject: req.data.subject })
+    return api.emit ('AverageRatings.Changed', rating)
   })
 
 })

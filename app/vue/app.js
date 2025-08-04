@@ -1,70 +1,59 @@
-import { createApp } from 'vue'
+import { createApp, ref, reactive } from 'vue'
 import cds from './cap.js'
 
 const { GET, PUT } = await cds.connect.to ('/rest/reviews/')
-const $ = sel => document.querySelector(sel)
-const reviews = createApp ({
+createApp ({ setup() {
 
-  data() {
-    return {
-      list: [],
-      review: undefined,
-      message: {},
-      Ratings: Object.entries({
-        5 : '★★★★★',
-        4 : '★★★★',
-        3 : '★★★',
-        2 : '★★',
-        1 : '★',
-      }).reverse()
-    }
-  },
+  const $ = sel => document.querySelector(sel)
+  const reviews = ref([])
+  const review = ref({
+    /** The reviewed subject, e.g. a book */  subject: '',
+    /** The reviewer */                       reviewer: '',
+    /** The review text */                    text: '',
+    /** The review rating */                  rating: 0,
+  })
 
-  methods: {
+  const message = reactive({
+    succeeded: undefined,
+    failed: undefined,
+    reset() { this.succeeded = this.failed = undefined }
+  })
 
-    search: ({target:{value:v}}) => reviews.fetch(v && '&$search='+v),
+  const Ratings = {
+    5: '★★★★★',
+    4: '★★★★☆',
+    3: '★★★☆☆',
+    2: '★★☆☆☆',
+    1: '★☆☆☆☆',
+  }
 
-    async fetch (filters='') {
-      const {data} = await GET `ListOfReviews?${filters}`
-      reviews.list = _decorated (data)
+  return {
+    reviews, review, message, Ratings,
+    at: date => date && new Date(date).toDateString(),
+
+    async fetch (pattern) {
+      const { data } = await GET `ListOfReviews${pattern ? `?$search=${pattern}` : ''}`
+      reviews.value = data
+      review.value = undefined
       $('input#search').focus()
     },
 
-    async inspect (eve) {
-      const review = reviews.review = reviews.list [eve.currentTarget.rowIndex-1]
-      const {data} = await GET `Reviews/${review.subject}/${review.reviewer}/text/$value`
-      review.text = data.text
-      reviews.message = {}
-    },
-
-    newReview () {
-      reviews.review = {}
-      reviews.message = {}
-      setTimeout (()=> $('form > input').focus(), 111)
-    },
-
-    async submitReview () {
-      const review = reviews.review
-      try {
-        await PUT (`Reviews`, review)
-        reviews.message = { succeeded: 'Your review was submitted successfully. Thanks.' }
-      } catch (e) {
-        reviews.message = { failed: e.response.data.error.message }
+    async edit (index) {
+      if (index !== undefined) {
+        review.value = reviews.value [index]
+        const { subject, reviewer } = review.value
+        const { data } = await GET `Reviews/${subject}/${reviewer}/text/$value`
+        review.value.text = data.text
+      } else {
+        review.value = {}
+        setTimeout (()=> $('form > input').focus(), 111)
       }
-    }
+      message.reset()
+    },
 
-  },
-
-}).mount("#app")
-
-
-const _decorated = reviews => ({ __proto__: reviews, [Symbol.iterator]: function* () {
-  for (let each of reviews) yield { __proto__: each,
-    get stars() { return ('★'.repeat(Math.round(this.rating))+'☆☆☆☆☆').slice(0,5) },
-    get datetime() { return this.date && new Date(this.date).toDateString() },
+    submit: ()=> PUT (`Reviews`, review.value)
+    .then (()=> message.succeeded = 'Your review was submitted. Thanks.')
+    .catch (e => message.failed = e.response.data.error.message)
   }
-}})
 
-
-// initially fill list of my reviews
-reviews.fetch()
+}}) .mount("#app") .fetch()
