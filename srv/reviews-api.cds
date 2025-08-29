@@ -2,7 +2,8 @@
 using { sap.capire.reviews as my } from '../db/schema';
 namespace sap.capire.reviews.api;
 
-@rest @hcql service ReviewsService @(path:'reviews/api') {
+@hcql @rest
+service ReviewsService @(path:'reviews/api') {
 
   /**
    * Summary of average ratings per subject.
@@ -14,6 +15,11 @@ namespace sap.capire.reviews.api;
   } group by subject;
 
   /**
+   * Informs about changes in a subject's rating.
+   */
+  event AverageRatings.Changed : AverageRatings;
+
+  /**
    * Allows to rate a subject by a user.
    */
   action rate (
@@ -23,10 +29,4 @@ namespace sap.capire.reviews.api;
     title    : my.Reviews:title    default null,
     text     : my.Reviews:text     default null,
   );
-
-  /**
-   * Informs about changes in a subject's rating.
-   */
-  event AverageRatings.Changed : AverageRatings;
-
 }
