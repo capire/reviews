@@ -13,7 +13,7 @@
     "@sap/cds": ">=5",
     "@sap/xssec": "^4.2.7",
     "express": "^4.17.1",
-    "@sap/cds-mtxs": "git+https://github.tools.sap/cap/cds-mtxs.git#ext-appid-separation",
+    "@sap/cds-mtxs": "git+https://github.tools.sap/cap/cds-mtxs.git",
     "@sap-cloud-sdk/connectivity": "^4",
     "@sap-cloud-sdk/resilience": "^4",
     "@sap-cloud-sdk/http-client": "^4"
