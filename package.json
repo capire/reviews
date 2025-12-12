@@ -50,7 +50,8 @@
           "kind": "sqlite"
         }
       }
-    }
+    },
+    "appid": true
   },
   "scripts": {
     "start": "cds-serve"
