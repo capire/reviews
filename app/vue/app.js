@@ -49,9 +49,12 @@ createApp ({ setup() {
       message.reset()
     },
 
-    submit: ()=> PUT (`Reviews`, review.value)
-    .then (()=> message.succeeded = 'Your review was submitted. Thanks.')
-    .catch (e => message.failed = e.response.data.error.message)
+    submit: () => {
+      message.reset()
+      PUT (`Reviews`, review.value)
+        .then ((result) => { review.value = result.data; message.succeeded = 'Your review was submitted. Thanks.' })
+        .catch (e => message.failed = e.response?.data?.error?.message || e.message )
+    }
   }
 
 }}) .mount("#app") .fetch()
