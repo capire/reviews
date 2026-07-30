@@ -16,9 +16,6 @@
   "devDependencies": {
     "@cap-js/sqlite": ">=1"
   },
-  "devDependencies": {
-    "@cap-js/sqlite": ">=1"
-  },
   "cds": {
     "requires": {
       "messaging": true,
