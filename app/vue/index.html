@@ -58,6 +58,8 @@
       </select>
       <textarea v-model="review.text" rows="4"></textarea>
       <input type="submit" value="Submit" class="round-button muted-button">
+      <input type="button" value="Like" class="round-button muted-button" @click="like">
+      <input type="button" value="Unlike" class="round-button muted-button" @click="unlike">
       <span :class="message"> {{ message.succeeded || message.failed }} </span>
     </form>
 

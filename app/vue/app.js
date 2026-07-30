@@ -1,7 +1,7 @@
 import { createApp, ref, reactive } from 'vue'
 import cds from './cap.js'
 
-const { GET, PUT } = await cds.connect.to ('/rest/reviews/')
+const { GET, PUT, POST } = await cds.connect.to ('/rest/reviews/')
 createApp ({ setup() {
 
   const $ = sel => document.querySelector(sel)
@@ -47,6 +47,22 @@ createApp ({ setup() {
         setTimeout (()=> $('form > input').focus(), 111)
       }
       message.reset()
+    },
+
+    like: ()=> {
+      message.reset()
+      const { subject, reviewer } = review.value
+      POST (`like`, {review:{subject,reviewer}})
+        .then (()=> { message.succeeded = 'Your like was submitted. Thanks.'})
+        .catch (e => message.failed = e.response.data.error.message)
+    },
+
+    unlike: ()=> {
+      message.reset()
+      const { subject, reviewer } = review.value
+      POST (`unlike`, {review:{subject,reviewer}})
+        .then (()=> { message.succeeded = 'Your unlike was submitted. Thanks.'})
+        .catch (e => message.failed = e.response.data.error.message)
     },
 
     submit: () => {
