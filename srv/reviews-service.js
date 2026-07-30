@@ -29,11 +29,10 @@ module.exports = cds.service.impl (async function(){
   })
 
 
-  // Inform API event subscribers about new avg ratings for reviewed subjects
-  const api = await cds.connect.to ('sap.capire.reviews.api.ReviewsService')
+  // Inform subscribers about new avg ratings for reviewed subjects
   this.after (['CREATE','UPDATE','DELETE'], 'Reviews', async function(_,req) {
-    const { subject, rating, reviews } = await api.get ('AverageRatings', { subject: req.data.subject })
-    return api.emit ('AverageRatings.Changed', { subject, rating, reviews })
+    const { subject, rating, reviews } = await this.get ('AverageRatings', { subject: req.data.subject })
+    return this.emit ('AverageRatings.Changed', { subject, rating, reviews })
   })
 
 })
