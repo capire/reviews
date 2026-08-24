@@ -8,8 +8,6 @@ annotate ReviewsService.Reviews with @restrict:[
   { grant:'DELETE', to:'admin' },
 ];
 
-// Access control restrictions on service-level actions
-annotate ReviewsService with @restrict:[
-  { grant:'like', to:'identified-user' },
-  { grant:'unlike', to:'identified-user', where:'user=$user' },
-];
+// Access control restrictions on actions
+annotate ReviewsService.like   with @restrict: [{ grant:'like',   to:'identified-user' }];
+annotate ReviewsService.unlike with @restrict: [{ grant:'unlike', to:'identified-user', where:'user=$user' }];
