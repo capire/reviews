@@ -9,5 +9,5 @@ annotate ReviewsService.Reviews with @restrict:[
 ];
 
 // Access control restrictions on actions
-annotate ReviewsService.like   with @restrict: [{ grant:'like',   to:'identified-user' }];
-annotate ReviewsService.unlike with @restrict: [{ grant:'unlike', to:'identified-user', where:'user=$user' }];
+annotate ReviewsService.like   with @restrict: [{ to:'identified-user' }];
+annotate ReviewsService.unlike with @restrict: [{ to:'identified-user', where:'user=$user' }];
