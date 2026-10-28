@@ -1,8 +1,8 @@
-const { describe, it, before, beforeEach } = require('node:test')
+const { describe, it, beforeEach } = require('node:test')
 const assert = require('node:assert/strict')
 const cds = require('@sap/cds')
 
-const { GET, POST, defaults } = cds.test(__dirname + '/..')
+const { POST, defaults } = cds.test(__dirname + '/..')
 cds.requires.messaging = { kind: 'file-based-messaging', file: 'gen/messages.txt' }
 
 defaults.path = '/rest/reviews'
