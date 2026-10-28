@@ -23,7 +23,6 @@ module.exports = cds.service.impl (async function(){
   this.on ('unlike', async (req) => {
     if (!req.user)  return req.reject(400, 'You must be identified to remove a former like of yours')
     let {review} = req.data, { subject, reviewer } = review, {user} = req
-    // Assuming Reviews entity uses composite keys: subject and user_ID
     let affectedRows = await DELETE.from (Likes) .where ({ review_subject: subject, review_reviewer: reviewer, user: user.id })
     if (affectedRows === 1)  return UPDATE (Reviews) .set ({ liked: {'-=': 1} }) .where ({ subject, reviewer })
     return req.reject(400, 'You have not liked that review')
