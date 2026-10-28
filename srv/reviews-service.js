@@ -14,7 +14,7 @@ module.exports = cds.service.impl (async function(){
     if (!req.user)  return req.reject(400, 'You must be identified to like a review')
     let {review} = req.data, {user} = req
     return cds.run ([
-      INSERT.into (Likes) .entries ({review_subject: review.subject, review_user: review.user, user: user.id}),
+      INSERT.into (Likes) .entries ({review_subject: review.subject, review_reviewer: review.reviewer, user: user.id}),
       UPDATE (Reviews) .set({liked: {'+=': 1}}) .where(review)
     ]).catch(() => req.reject(400, 'You already liked that review'))
   })
@@ -24,8 +24,9 @@ module.exports = cds.service.impl (async function(){
     if (!req.user)  return req.reject(400, 'You must be identified to remove a former like of yours')
     let {review} = req.data, { subject, reviewer } = review, {user} = req
     // Assuming Reviews entity uses composite keys: subject and user_ID
-    let affectedRows = await DELETE.from (Likes) .where ({ subject, reviewer, user: user.id })
+    let affectedRows = await DELETE.from (Likes) .where ({ review_subject: subject, review_reviewer: reviewer, user: user.id })
     if (affectedRows === 1)  return UPDATE (Reviews) .set ({ liked: {'-=': 1} }) .where ({ subject, reviewer })
+    return req.reject(400, 'You have not liked that review')
   })
 
 
