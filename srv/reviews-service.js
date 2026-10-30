@@ -14,7 +14,7 @@ module.exports = cds.service.impl (async function(){
     if (!req.user)  return req.reject(400, 'You must be identified to like a review')
     let {review} = req.data, {user} = req
     return cds.run ([
-      INSERT.into (Likes) .entries ({review_subject: review.subject, review_reviewer: review.reviewer, user: user.id}),
+      INSERT.into (Likes) .entries ({review:{subject: review.subject, reviewer: review.reviewer}, user: user.id}),
       UPDATE (Reviews) .set({liked: {'+=': 1}}) .where(review)
     ]).catch(() => req.reject(400, 'You already liked that review'))
   })
